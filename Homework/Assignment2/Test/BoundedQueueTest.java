@@ -2,25 +2,24 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 public class BoundedQueueTest {
-
-    //the case that 
-    @Test
-    public void testConstructorValidCapacity() {
+ 
+    @Test//test every variable to ensure that the constructor initializes them correctly
+    public void testConstructorValid() {
         BoundedQueue q = new BoundedQueue(3);
         assertTrue(q.isEmpty());
         assertFalse(q.isFull());
         assertEquals("[]", q.toString());
     }
 
-    @Test
-    public void testConstructorNegativeCapacity() {
+    @Test//test the exception to make sure it is thrown properly
+    public void testConstructorNegative() {
         assertThrows(IllegalArgumentException.class, () -> {
             new BoundedQueue(-1);
         });
     }
 
-    @Test
-    public void testEnQueueNormal() {
+    @Test//test the enQueue method to make sure it adds elements correctly
+    public void testEnQueue() {
         BoundedQueue q = new BoundedQueue(2);
         q.enQueue("A");
         assertFalse(q.isEmpty());
@@ -28,7 +27,7 @@ public class BoundedQueueTest {
         assertEquals("[A]", q.toString());
     }
 
-    @Test
+    @Test//test the exception to make sure it is thrown properly
     public void testEnQueueNull() {
         BoundedQueue q = new BoundedQueue(2);
         assertThrows(NullPointerException.class, () -> {
@@ -36,7 +35,7 @@ public class BoundedQueueTest {
         });
     }
 
-    @Test
+    @Test//test the exception to make sure it is thrown properly
     public void testEnQueueFull() {
         BoundedQueue q = new BoundedQueue(1);
         q.enQueue("A");
@@ -46,19 +45,19 @@ public class BoundedQueueTest {
         });
     }
 
-    @Test
-    public void testDeQueueNormal() {
+    @Test//test the deQueue method to make sure it removes elements correctly
+    public void testDeQueue() {
         BoundedQueue q = new BoundedQueue(2);
         q.enQueue("A");
         q.enQueue("B");
 
         Object result = q.deQueue();
         assertEquals("A", result);
-        assertEquals("[B]", q.toString());
+        assertEquals("[B]", q.toString());//this needs brackets
         assertFalse(q.isEmpty());
     }
 
-    @Test
+    @Test//test the exception to make sure it is thrown properly
     public void testDeQueueEmpty() {
         BoundedQueue q = new BoundedQueue(2);
         assertThrows(IllegalStateException.class, () -> {
@@ -66,7 +65,7 @@ public class BoundedQueueTest {
         });
     }
 
-    @Test
+    @Test//test to ensure that the queue maintains FIFO order
     public void testFIFOOrder() {
         BoundedQueue q = new BoundedQueue(3);
         q.enQueue("A");
@@ -79,51 +78,64 @@ public class BoundedQueueTest {
         assertTrue(q.isEmpty());
     }
 
-    @Test
-    public void testWrapAroundEnQueueDeQueue() {
+    @Test//test to ensure that the queue can wrap around correctly when elements are added and removed
+    public void testEnQueueAfterDeQueue() {
         BoundedQueue q = new BoundedQueue(3);
 
         q.enQueue("A");
         q.enQueue("B");
-        q.enQueue("C");
+        q.enQueue("C");//after all three enqueues, the queue should be [A, B, C]
 
         assertEquals("A", q.deQueue());
-        assertEquals("B", q.deQueue());
+        assertEquals("B", q.deQueue());//queue should now be [C]
 
         q.enQueue("D");
-        q.enQueue("E");
+        q.enQueue("E");//queue should now be [C, D, E]
 
         assertTrue(q.isFull());
         assertEquals("[C, D, E]", q.toString());
     }
 
-    @Test
+    @Test//test to ensure that the isEmpty and isFull methods return the correct values at different stages of the queue's state
     public void testIsEmptyAndIsFull() {
-        BoundedQueue q = new BoundedQueue(2);
-
+        BoundedQueue q = new BoundedQueue(3);
+        
+        //queue should be [ ]
         assertTrue(q.isEmpty());
         assertFalse(q.isFull());
 
-        q.enQueue("A");
+        q.enQueue("A");//queue should be [A]
         assertFalse(q.isEmpty());
         assertFalse(q.isFull());
 
-        q.enQueue("B");
+        q.enQueue("B");//queue should be [A, B]
+        assertFalse(q.isEmpty());
+        assertFalse(q.isFull());
+
+        q.deQueue();//queue should be [B]
+        assertFalse(q.isEmpty());
+        assertFalse(q.isFull());
+
+        q.enQueue("C");//queue should be [B, C]
+        assertFalse(q.isEmpty());
+        assertFalse(q.isFull());
+
+        q.enQueue("D");//queue should be [B, C, D]
         assertFalse(q.isEmpty());
         assertTrue(q.isFull());
 
-        q.deQueue();
+        q.deQueue();//queue should be [C, D]
         assertFalse(q.isEmpty());
         assertFalse(q.isFull());
     }
 
-    @Test
+    @Test//test to make sure the string representation is correct
     public void testToStringEmpty() {
         BoundedQueue q = new BoundedQueue(3);
         assertEquals("[]", q.toString());
     }
 
-    @Test
+    @Test//test to make sure the string representation when partially completed is correct
     public void testToStringPartial() {
         BoundedQueue q = new BoundedQueue(3);
         q.enQueue("A");
@@ -131,8 +143,8 @@ public class BoundedQueueTest {
         assertEquals("[A, B]", q.toString());
     }
 
-    @Test
-    public void testToStringAfterWrapAround() {
+    @Test//test to make sure the string representation after a dequeue is correct
+    public void testToStringAfterDeQueue() {
         BoundedQueue q = new BoundedQueue(2);
         q.enQueue("A");
         q.enQueue("B");
